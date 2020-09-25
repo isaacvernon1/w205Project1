@@ -398,20 +398,156 @@ BigQuery or the bq command line tool.  Paste your questions, queries and
 answers below.
 
 - Question 1: Are there more trips shorter than an hour or longer than an hour?
-  * Answer:
+  * Answer: We find that the vast majority of trips that people take are shorter than an hour.
   * SQL query:
+```sql
+SELECT
+  COUNT(*) AS Trips,
+  Length_of_Trip
+FROM (
+  SELECT
+    CASE
+      WHEN duration_sec <= 3600 THEN "Less_Than_Hour"
+    ELSE
+    "More_Than_Hour"
+  END
+    AS Length_of_Trip
+  FROM
+    `bigquery-public-data.san_francisco.bikeshare_trips`)
+GROUP BY
+  Length_of_Trip
+ORDER BY
+  Trips DESC
+```
+```
++--------+----------------+
+| Trips  | Length_of_Trip |
++--------+----------------+
+| 955557 | Less_Than_Hour |
+|  28091 | More_Than_Hour |
++--------+----------------+
+```
 
-- Question 2: Is there an hour in the day that we have low ridership?
-  * Answer:
+- Question 2: Is there an hour in the day that we have low ridership (People don't start trips during the hour)?
+  * Answer: We find that we have the lowest ridership for the hours between 11pm and 5am (with 3am being the least utilized). There are also few riders around 9 and 10pm, with a little more (but still few) around 8pm and 6am.
   * SQL query:
+```sql
+SELECT
+  COUNT(*) AS Number_of_Trips,
+  EXTRACT(HOUR from start_date) as Start_Hour
+FROM (
+  SELECT
+    start_date
+  FROM
+    `bigquery-public-data.san_francisco.bikeshare_trips`)
+GROUP BY
+  Start_Hour
+ORDER BY
+  Number_of_Trips ASC
+```
+```
++-----------------+------------+
+| Number_of_Trips | Start_Hour |
++-----------------+------------+
+|             605 |          3 |
+|             877 |          2 |
+|            1398 |          4 |
+|            1611 |          1 |
+|            2929 |          0 |
+|            5098 |          5 |
+|            6195 |         23 |
+|           10270 |         22 |
+|           15258 |         21 |
+|           20519 |          6 |
+|           22747 |         20 |
+|           37852 |         14 |
+|           40407 |         11 |
+|           41071 |         19 |
+|           42782 |         10 |
+|           43714 |         13 |
+|           46950 |         12 |
+|           47626 |         15 |
+|           67531 |          7 |
+|           84569 |         18 |
+|           88755 |         16 |
+|           96118 |          9 |
+|          126302 |         17 |
+|          132464 |          8 |
++-----------------+------------+
+```
 
 - Question 3: Is there a day in the week for which we have low ridership?
-  * Answer:
+  * Answer: Similar to what we found in a previous investigation, we have significantly lower ridership on the weekends than the weekdays. In addition, we can also see that there is also slightly less ridership on Friday as compared to the other weekdays. Overall though, Sunday has the least ridership closely followed by Saturday.
   * SQL query:
-  
-- Question 4: How many of our trips were what we define as commuter trips?
-  * Answer:
+```sql
+SELECT
+    count(*) as Number_of_Trips,
+        CASE EXTRACT(DAYOFWEEK FROM start_date)
+             WHEN 1 THEN "Sunday"
+             WHEN 2 THEN "Monday"
+             WHEN 3 THEN "Tuesday"
+             WHEN 4 THEN "Wednesday"
+             WHEN 5 THEN "Thursday"
+             WHEN 6 THEN "Friday"
+             WHEN 7 THEN "Saturday"
+         END AS Day_of_Week,
+FROM
+    (SELECT start_date FROM `bigquery-public-data.san_francisco.bikeshare_trips`)
+GROUP BY Day_of_Week
+ORDER BY Number_of_Trips ASC
+```
+```
++-----------------+-------------+
+| Number_of_Trips | Day_of_Week |
++-----------------+-------------+
+|           51375 | Sunday      |
+|           60279 | Saturday    |
+|          159977 | Friday      |
+|          169937 | Monday      |
+|          176908 | Thursday    |
+|          180767 | Wednesday   |
+|          184405 | Tuesday     |
++-----------------+-------------+
+```
+
+- Question 4: How many of our trips were what we intially define as commuter trips (Mon - Fri, 7-10am, 4-7pm, Different start and end stations, between 5 minutes and 1 hour)?
+  * Answer: With our initial definition of commuter trips, we find that there are 291,397 trips that fit our description of commuter trips.
   * SQL query:
+```sql
+SELECT
+  COUNT(*) AS Number_of_Trips,
+FROM (
+  SELECT
+    start_date,
+    start_station_name,
+    end_station_name,
+    CAST(ROUND(duration_sec / 60.0) AS INT64) AS duration_minutes,
+    EXTRACT(HOUR
+    FROM
+      start_date) AS Start_Hour,
+    EXTRACT(DAYOFWEEK
+    FROM
+      start_date) AS dow,
+  FROM
+    `bigquery-public-data.san_francisco.bikeshare_trips`)
+WHERE
+  start_station_name <> end_station_name
+  AND ((Start_Hour > 6
+      AND Start_Hour < 11)
+    OR (Start_Hour > 4
+      AND Start_Hour < 8))
+  AND (dow > 1
+    AND dow < 7)
+  AND (duration_minutes >= 5
+    AND duration_minutes <= 60)
+```
+```
++-----------------+
+| Number_of_Trips |
++-----------------+
+|          291397 |
++-----------------+
+```
   
 - ...
 
