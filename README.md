@@ -127,13 +127,16 @@ Paste your SQL query and answer the question in a sentence.  Be sure you properl
 - What's the size of this dataset? (i.e., how many trips)
 
 ```sql
-SELECT count(*) FROM `bigquery-public-data.san_francisco.bikeshare_trips`
+SELECT count(*) 
+FROM `bigquery-public-data.san_francisco.bikeshare_trips`
+```
 ```
 +--------+
 |  f0_   |
 +--------+
 | 983648 |
 +--------+
+```
 
 After running our query we find that there are 983,648 trips in the dataset.
 
@@ -143,6 +146,15 @@ After running our query we find that there are 983,648 trips in the dataset.
 SELECT min(start_date), max(end_date)
 FROM `bigquery-public-data.san_francisco.bikeshare_trips`
 ```
+
+```
++---------------------+---------------------+
+|         f0_         |         f1_         |
++---------------------+---------------------+
+| 2013-08-29 09:08:00 | 2016-08-31 23:48:00 |
++---------------------+---------------------+
+```
+
 The earliest trip in the dataset was on August 29th, 2013 at 9:08 am and the latest trip ended at 11:48 pm on August 31, 2016. 
 
 - How many bikes are there?
@@ -151,22 +163,96 @@ The earliest trip in the dataset was on August 29th, 2013 at 9:08 am and the lat
 SELECT count(distinct bike_number)
 FROM `bigquery-public-data.san_francisco.bikeshare_trips`
 ```
+
+```
++-----+
+| f0_ |
++-----+
+| 700 |
++-----+
+```
 There are a total of 700 bikes across all of the stations.
 
 ### Questions of your own
 - Make up 3 questions and answer them using the Bay Area Bike Share Trips Data.  These questions MUST be different than any of the questions and queries you ran above.
 
 - Question 1: How many trips were between 5 minutes and 1 hour?
-  * Answer:
+  * Answer: We find that there were 776,865 trips that lasted between 5 minutes and 1 hour.
   * SQL query:
+```sql
+SELECT
+  count(*) as Number_of_Trips,
+FROM
+  `bigquery-public-data.san_francisco.bikeshare_trips`
+WHERE duration_sec >= 300 AND duration_sec <= 3600
+```
+```
++-----------------+
+| Number_of_Trips |
++-----------------+
+|          776865 |
++-----------------+
+```
 
-- Question 2: What day of the week had the greatest total number of trips?
-  * Answer:
+- Question 2: What station had the greatest number of trips start from there?
+  * Answer: When we look at the five stations that had the greatest number of trips started from there, we can find that the San Francisco Caltrain station (Townsend at 4th) had the most, meaning that the San Francisco Caltrain station (Townsend at 4th) saw the most bike trips started of all stations.
   * SQL query:
+```sql
+SELECT
+  count(*) as Number_of_Trips,
+  start_station_name, 
+FROM
+  `bigquery-public-data.san_francisco.bikeshare_trips`
+GROUP BY start_station_name
+ORDER BY Number_of_Trips DESC
+LIMIT 5
+```
+```
++-----------------+------------------------------------------+
+| Number_of_Trips |            start_station_name            |
++-----------------+------------------------------------------+
+|           72683 | San Francisco Caltrain (Townsend at 4th) |
+|           56100 | San Francisco Caltrain 2 (330 Townsend)  |
+|           49062 | Harry Bridges Plaza (Ferry Building)     |
+|           41137 | Embarcadero at Sansome                   |
+|           39936 | 2nd at Townsend                          |
++-----------------+------------------------------------------+
+```
 
-- Question 3: What station had the greatest number of trips start from there?
-  * Answer:
+- Question 3: What day of the week had the greatest total number of trips?
+  * Answer: When we look at the number of trips for each day, we find that Tuesday had the most occurences at 184,405 trips. In addition, we can see that this value is relatively close to Wednesday, Thursday, and Monday as well, with Friday a little bit behind those. Finally, the least trips by a significant margin are on Saturday and Sunday.
   * SQL query:
+```sql
+SELECT
+    count(*) as Number_of_Trips,
+        CASE EXTRACT(DAYOFWEEK FROM start_date)
+             WHEN 1 THEN "Sunday"
+             WHEN 2 THEN "Monday"
+             WHEN 3 THEN "Tuesday"
+             WHEN 4 THEN "Wednesday"
+             WHEN 5 THEN "Thursday"
+             WHEN 6 THEN "Friday"
+             WHEN 7 THEN "Saturday"
+         END AS Day_of_Week,
+FROM
+    (SELECT start_date FROM `bigquery-public-data.san_francisco.bikeshare_trips`)
+GROUP BY Day_of_Week
+ORDER BY Number_of_Trips DESC
+```
+
+```
++-----------------+-------------+
+| Number_of_Trips | Day_of_Week |
++-----------------+-------------+
+|          184405 | Tuesday     |
+|          180767 | Wednesday   |
+|          176908 | Thursday    |
+|          169937 | Monday      |
+|          159977 | Friday      |
+|           60279 | Saturday    |
+|           51375 | Sunday      |
++-----------------+-------------+
+```
 
 ### Bonus activity queries (optional - not graded - just this section is optional, all other sections are required)
 
@@ -210,15 +296,82 @@ from `bigquery-public-data.san_francisco_bikeshare.bikeshare_station_info`
    queries and results here, using properly formatted markdown):
 
   * What's the size of this dataset? (i.e., how many trips)
+  
+```
+    bq query --use_legacy_sql=false '
+        SELECT count(*)
+        FROM
+           `bigquery-public-data.san_francisco.bikeshare_trips`'
+```
+
+```
++--------+
+|  f0_   |
++--------+
+| 983648 |
++--------+
+```
 
   * What is the earliest start time and latest end time for a trip?
 
+```
+    bq query --use_legacy_sql=false '
+        SELECT min(start_date), max(end_date)
+        FROM
+            `bigquery-public-data.san_francisco.bikeshare_trips`'
+
+```
+
+```
++---------------------+---------------------+
+|         f0_         |         f1_         |
++---------------------+---------------------+
+| 2013-08-29 09:08:00 | 2016-08-31 23:48:00 |
++---------------------+---------------------+
+```
+
   * How many bikes are there?
+  
+```
+    bq query --use_legacy_sql=false '
+        SELECT count(distinct bike_number)
+        FROM 
+            `bigquery-public-data.san_francisco.bikeshare_trips`'
+```
+
+```
++-----+
+| f0_ |
++-----+
+| 700 |
++-----+
+```
 
 2. New Query (Run using bq and paste your SQL query and answer the question in a sentence, using properly formatted markdown):
 
   * How many trips are in the morning vs in the afternoon?
+  
+```
+    bq query --use_legacy_sql=false '
+        SELECT
+            count(*) as Number_of_Trips,
+            CASE 
+               WHEN EXTRACT(HOUR FROM start_date) <= 12 THEN "Morning"
+               WHEN EXTRACT(HOUR FROM start_date) > 12 THEN "Afternoon"
+            END as Time_of_Day
+        FROM
+          `bigquery-public-data.san_francisco.bikeshare_trips`
+        GROUP BY Time_of_Day'
+```
 
+```
++-----------------+-------------+
+| Number_of_Trips | Time_of_Day |
++-----------------+-------------+
+|          524359 | Afternoon   |
+|          459289 | Morning     |
++-----------------+-------------+
+```
 
 ### Project Questions
 Identify the main questions you'll need to answer to make recommendations (list
