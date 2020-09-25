@@ -126,39 +126,45 @@ Paste your SQL query and answer the question in a sentence.  Be sure you properl
 
 - What's the size of this dataset? (i.e., how many trips)
 
+```sql
+SELECT count(*) FROM `bigquery-public-data.san_francisco.bikeshare_trips`
 ```
-    SELECT count(*) FROM `bigquery-public-data.san_francisco.bikeshare_trips`
-```
++--------+
+|  f0_   |
++--------+
+| 983648 |
++--------+
+
 After running our query we find that there are 983,648 trips in the dataset.
 
 - What is the earliest start date and time and latest end date and time for a trip?
 
-```
-    SELECT min(start_date), max(end_date)
-    FROM `bigquery-public-data.san_francisco.bikeshare_trips`
+```sql
+SELECT min(start_date), max(end_date)
+FROM `bigquery-public-data.san_francisco.bikeshare_trips`
 ```
 The earliest trip in the dataset was on August 29th, 2013 at 9:08 am and the latest trip ended at 11:48 pm on August 31, 2016. 
 
 - How many bikes are there?
 
-```
-    SELECT count(distinct bike_number)
-    FROM `bigquery-public-data.san_francisco.bikeshare_trips`
+```sql
+SELECT count(distinct bike_number)
+FROM `bigquery-public-data.san_francisco.bikeshare_trips`
 ```
 There are a total of 700 bikes across all of the stations.
 
 ### Questions of your own
 - Make up 3 questions and answer them using the Bay Area Bike Share Trips Data.  These questions MUST be different than any of the questions and queries you ran above.
 
-- Question 1: 
+- Question 1: How many trips were between 5 minutes and 1 hour?
   * Answer:
   * SQL query:
 
-- Question 2:
+- Question 2: What day of the week had the greatest total number of trips?
   * Answer:
   * SQL query:
 
-- Question 3:
+- Question 3: What station had the greatest number of trips start from there?
   * Answer:
   * SQL query:
 
@@ -218,13 +224,15 @@ from `bigquery-public-data.san_francisco_bikeshare.bikeshare_station_info`
 Identify the main questions you'll need to answer to make recommendations (list
 below, add as many questions as you need).
 
-- Question 1: 
+- Question 1: What are our definitions for a commuter trip?
 
-- Question 2: 
+- Question 2: How many of our trips were what define as commuter trips?
 
-- Question 3: 
+- Question 3: Is there a day in the week that we have low ridership?
 
-- Question 4: 
+- Question 4: Is there an hour in the day that we have low ridership?
+
+- Question 5: Are there more trips shorter than an hour or longer than an hour?
 
 - ...
 
@@ -236,19 +244,19 @@ Answer at least 4 of the questions you identified above You can use either
 BigQuery or the bq command line tool.  Paste your questions, queries and
 answers below.
 
-- Question 1: 
+- Question 1: Are there more trips shorter than an hour or longer than an hour?
   * Answer:
   * SQL query:
 
-- Question 2:
+- Question 2: Is there an hour in the day that we have low ridership?
   * Answer:
   * SQL query:
 
-- Question 3:
+- Question 3: Is there a day in the week for which we have low ridership?
   * Answer:
   * SQL query:
   
-- Question 4:
+- Question 4: How many of our trips were what we define as commuter trips?
   * Answer:
   * SQL query:
   
