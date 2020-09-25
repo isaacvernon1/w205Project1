@@ -377,19 +377,19 @@ from `bigquery-public-data.san_francisco_bikeshare.bikeshare_station_info`
 Identify the main questions you'll need to answer to make recommendations (list
 below, add as many questions as you need).
 
-- Question 1: What are our definitions for a commuter trip?
+- Question 1: Are there more trips shorter than an hour or longer than an hour?
 
-- Question 2: How many of our trips were what define as commuter trips?
+- Question 2: Is there an hour in the day that we have low ridership?
 
 - Question 3: Is there a day in the week that we have low ridership?
 
-- Question 4: Is there an hour in the day that we have low ridership?
+- Question 4: How many of our trips were what we intially define as commuter trips (Mon - Fri, 7-10am, 4-7pm, Different start and end stations, between 5 minutes and 1 hour)?
 
-- Question 5: Are there more trips shorter than an hour or longer than an hour?
+- Question 5: 
 
 - ...
 
-- Question n: 
+- Question n: What are our definitions for a commuter trip?
 
 ### Answers
 
@@ -548,10 +548,8 @@ WHERE
 |          291397 |
 +-----------------+
 ```
-  
-- ...
 
-- Question n:
+- Question 5:
   * Answer:
   * SQL query:
 
