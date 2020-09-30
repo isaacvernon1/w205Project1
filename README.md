@@ -385,7 +385,15 @@ below, add as many questions as you need).
 
 - Question 4: How many of our trips were what we intially define as commuter trips (Mon - Fri, 7-10am, 4-7pm, Different start and end stations, between 5 minutes and 1 hour)?
 
-- Question 5: 
+- Question 5: How many of the trips in the dataset are from subscribers?
+
+- Question 6: Which stations have the most amount of trips starting from them?
+
+- Question 7: Which stations have the least amount of trips starting from them?
+
+- Question 8: For those stations that had few trips starting from them, what was their total amount of trips?
+
+- Question 9: For these stations with a small number of trips, when were the built/implemented?
 
 - ...
 
@@ -549,9 +557,142 @@ WHERE
 +-----------------+
 ```
 
-- Question 5:
+- Question 5: How many of the trips in the dataset are from subscribers?
+  * Answer: We find that 846,839 trips in the dataset are subscribers, which we could also think of as around 86% of trips.
+  * SQL query:
+```sql
+SELECT
+  COUNT(*) AS Number_of_Trips,
+  subscriber_type
+FROM
+  `bigquery-public-data.san_francisco.bikeshare_trips`
+GROUP BY
+  subscriber_type
+```
+```
++-----------------+-----------------+
+| Number_of_Trips | subscriber_type |
++-----------------+-----------------+
+|          136809 | Customer        |
+|          846839 | Subscriber      |
++-----------------+-----------------+
+```
+
+- Question 6: Which stations have the most amount of trips starting from them?
+  * Answer: We find that the stations that have the most trips starting from them are San Francisco Caltrain (Townsend at 4th), San Francisco Caltrain 2 (330 Townsend), Harry Bridges Plaza (Ferry Building), Embarcadero at Sansome, and 2nd at Townsend.
+  * SQL query:
+```sql
+SELECT
+  Count(*) as Number_of_Trips,
+  start_station_name as Station
+FROM
+  `bigquery-public-data.san_francisco.bikeshare_trips`
+GROUP BY
+  start_station_name
+ORDER BY
+  Number_of_Trips DESC
+LIMIT
+  5
+```
+```
++-----------------+------------------------------------------+
+| Number_of_Trips |                 Station                  |
++-----------------+------------------------------------------+
+|           72683 | San Francisco Caltrain (Townsend at 4th) |
+|           56100 | San Francisco Caltrain 2 (330 Townsend)  |
+|           49062 | Harry Bridges Plaza (Ferry Building)     |
+|           41137 | Embarcadero at Sansome                   |
+|           39936 | 2nd at Townsend                          |
++-----------------+------------------------------------------+
+```
+
+- Question 7: Which stations have the least amount of trips starting from them?
+  * Answer: We find that the stations that have the least number of trips starting from them are 5th St at E. San Salvador St, Sequoia Hospital, 5th S at E. San Salvador St, San Jose Government Center, and Middlefield Light Rail Station.
+  * SQL query:
+```sql
+SELECT
+  Count(*) as Number_of_Trips,
+  start_station_name as Station
+FROM
+  `bigquery-public-data.san_francisco.bikeshare_trips`
+GROUP BY
+  start_station_name
+ORDER BY
+  Number_of_Trips ASC
+LIMIT
+  5
+```
+```
++-----------------+--------------------------------+
+| Number_of_Trips |            Station             |
++-----------------+--------------------------------+
+|               1 | 5th St at E. San Salvador St   |
+|              15 | Sequoia Hospital               |
+|              19 | 5th S at E. San Salvador St    |
+|              23 | San Jose Government Center     |
+|              66 | Middlefield Light Rail Station |
++-----------------+--------------------------------+
+```
+
+- Question 8: For those stations that had few trips starting from them, what was their total amount of trips?
+  * Answer: We find that 5th St at E. San Salvador St had 2 total trips, Sequoia Hospital had 29 total trips, 5th S at E. San Salvador St had 43 total trips, San Jose Government Center had 46 total trips, and Middlefield Light Rail Station had 159 total trips.
+  * SQL query:
+```sql
+SELECT
+  table1.Num_Trips + table2.Number_of_Trips AS Trip_Total,
+  table1.Station1 AS Station
+FROM (
+  SELECT
+    COUNT(*) AS Num_Trips,
+    start_station_name AS Station1
+  FROM
+    `bigquery-public-data.san_francisco.bikeshare_trips`
+  GROUP BY
+    start_station_name
+  ORDER BY
+    Num_Trips ASC
+  LIMIT
+    5)AS table1
+LEFT JOIN (
+  SELECT
+    COUNT(*) AS Number_of_Trips,
+    end_station_name AS Station2
+  FROM
+    `bigquery-public-data.san_francisco.bikeshare_trips`
+  WHERE
+    end_station_name IN ("5th St at E. San Salvador St",
+      "Sequoia Hospital",
+      "5th S at E. San Salvador St",
+      "San Jose Government Center",
+      "Middlefield Light Rail Station")
+  GROUP BY
+    end_station_name
+  ORDER BY
+    Number_of_Trips ASC) AS table2
+ON
+  table1.Station1 = table2.Station2
+```
+```
++------------+--------------------------------+
+| Trip_Total |            Station             |
++------------+--------------------------------+
+|          2 | 5th St at E. San Salvador St   |
+|         29 | Sequoia Hospital               |
+|         43 | 5th S at E. San Salvador St    |
+|         46 | San Jose Government Center     |
+|        159 | Middlefield Light Rail Station |
++------------+--------------------------------+
+```
+  
+- Question 9: For these stations with a small number of trips, when were the built/implemented?
   * Answer:
   * SQL query:
+```sql
+
+```
+```
+
+```
 
 ---
 
