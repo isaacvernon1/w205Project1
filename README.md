@@ -635,7 +635,7 @@ LIMIT
 ```
 
 - Question 8: For those stations that had few trips starting from them, what was their total amount of trips?
-  * Answer: We find that 5th St at E. San Salvador St had 2 total trips, Sequoia Hospital had 29 total trips, 5th S at E. San Salvador St had 43 total trips, San Jose Government Center had 46 total trips, and Middlefield Light Rail Station had 159 total trips.
+  * Answer: We find that 5th St at E. San Salvador St had 2 total trips, Sequoia Hospital had 29 total trips, 5th S at E. San Salvador St had 43 total trips, San Jose Government Center had 46 total trips, and Middlefield Light Rail Station had 159 total trips (After further analysis, it is likely that 5th St at E. San Salvador St and 5th S at E. San Salvador St are likely the same station).
   * SQL query:
 ```sql
 SELECT
@@ -685,13 +685,29 @@ ON
 ```
   
 - Question 9: For these stations with a small number of trips, when were the built/implemented?
-  * Answer:
+  * Answer: Due to the rough nature of the data set, we only get one date when we look at the dataset. We can presume that 5th S at E. San Salvador St is equivalent to 5th S. at E. San Salvador St and then we get the two stations were installed in September 2015 (for Middlefield Light Rail) and June 2016 (for 5th S. at E. San Salvador St). 
   * SQL query:
 ```sql
-
+SELECT
+  name,
+  installation_date
+FROM
+  `bigquery-public-data.san_francisco.bikeshare_stations`
+WHERE
+  name IN ("5th S. at E. San Salvador St",
+    "Middlefield Light Rail Station",
+    "5th St at E. San Salvador St",
+    "Sequoia Hospital",
+    "5th S at E. San Salvador St",
+    "San Jose Government Center")
 ```
 ```
-
++--------------------------------+-------------------+
+|              name              | installation_date |
++--------------------------------+-------------------+
+| Middlefield Light Rail Station |        2015-09-28 |
+| 5th S. at E. San Salvador St   |        2016-06-05 |
++--------------------------------+-------------------+
 ```
 
 ---
